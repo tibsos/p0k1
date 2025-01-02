@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 from PIL import Image, ImageTk
 import json
 
@@ -39,13 +39,27 @@ root.title("Image Calibration Tool")
 
 # Загрузка изображения
 image_path = os.path.join(BASE_DIR, 'image_png1.png')  # Путь к загруженному изображению
-image = Image.open(image_path)
-photo = ImageTk.PhotoImage(image)
+try:
+    image = Image.open(image_path)
+    photo = ImageTk.PhotoImage(image)
+except FileNotFoundError:
+    messagebox.showerror("Error", f"Image file not found: {image_path}")
+    root.destroy()
+    exit()
+except Exception as e:
+    messagebox.showerror("Error", f"Failed to load image: {e}")
+    root.destroy()
+    exit()
 
 # Создание холста для отображения изображения
 canvas = tk.Canvas(root, width=image.width, height=image.height)
 canvas.pack()
-canvas.create_image(0, 0, anchor=tk.NW, image=photo)
+try:
+    canvas.create_image(0, 0, anchor=tk.NW, image=photo)
+except Exception as e:
+    messagebox.showerror("Error", f"Failed to display image: {e}")
+    root.destroy()
+    exit()
 
 # Привязка событий
 canvas.bind("<Button-1>", on_click)
